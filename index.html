@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!--
+  ============================================================
+  TribalFoxDance — лендинг танцевальной студии
+  ============================================================
+  Это ОДИН файл index.html с тремя "страницами" внутри:
+  Главная / Инфо / Галерея. Переключение страниц происходит
+  через JavaScript в самом низу файла — перезагрузки не
+  происходит, но у каждой страницы есть свой адрес-якорь
+  (#home, #info, #gallery), которым можно поделиться.
+
+  ГДЕ ИСКАТЬ ТЕКСТ ДЛЯ ЗАМЕНЫ:
+  Все места, которые стоит отредактировать, помечены
+  комментариями вида  <!-- РЕДАКТИРОВАТЬ: ... -->
+  Ищите слово "РЕДАКТИРОВАТЬ" по файлу (Ctrl+F).
+
+  Серые прямоугольники — это временные заглушки вместо фото.
+  Чтобы вставить реальное фото, замените div.placeholder на
+  <img src="путь-к-файлу.jpg" alt="описание"> с тем же классом.
+  ============================================================
+-->
+
+<!-- РЕДАКТИРОВАТЬ: название вкладки браузера -->
+<title>TribalFoxDance — школа Tribal &amp; ATS в Москве</title>
+<meta name="description" content="Танцевальная студия TribalFoxDance — обучение American Tribal Style (ATS) и FCBD®Style в Москве.">
+
+<!-- Шрифты: Unbounded — крупные заголовки, Manrope — основной текст. Оба поддерживают кириллицу. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+
+<style>
+
+/* ==========================================================
+   1. ТОКЕНЫ — цвета, шрифты, отступы.
+   Хотите поменять всю палитру сайта — меняйте значения здесь.
+   ========================================================== */
+:root{
+  /* тёплый чёрный — главный фон сайта */
+  --black:        #0b0908;
+  --black-soft:   #141110;
+  --surface:      #1b1613;
+  --surface-2:    #221c18;
+  --border:       #322a24;
+
+  /* тёплые светлые тона для текста */
+  --cream:        #ece4d6;
+  --cream-dim:    #b9ada0;
+  --muted:        #7d7468;
+
+  /* акценты, вдохновлённые монистами и хной в костюмах трайбл-танца */
+  --gold:         #c9973e;
+  --gold-bright:  #e4b95f;
+  --rust:         #a24327;
+  --rust-dim:     #7a3320;
+
+  --placeholder:  #2b2622;
+  --placeholder-line: #3a332c;
+
+  --font-display: "Unbounded", "Arial Narrow", sans-serif;
+  --font-body:    "Manrope", "Segoe UI", sans-serif;
+
+  --max-w: 1180px;
+  --radius-lg: 28px;
+  --radius-sm: 4px;
+
+  --dur: .5s;
+  --ease: cubic-bezier(.22,.7,.32,1);
+}
+
+@media (prefers-reduced-motion: reduce){
+  :root{ --dur: 0s; }
+  *{ scroll-behavior: auto !important; }
+}
+
+/* ==========================================================
+   2. СБРОС / БАЗА
+   ========================================================== */
+*, *::before, *::after{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+
+body{
+  margin: 0;
+  background: var(--black);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img{ max-width: 100%; display: block; }
+a{ color: inherit; }
+button{ font: inherit; color: inherit; }
+ul{ margin: 0; padding: 0; list-style: none; }
+h1,h2,h3,p,figure{ margin: 0; }
+
+.container{
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* Видно только для скринридеров, кроме как в фокусе (ссылка "пропустить навигацию") */
+.visually-hidden{
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.skip-link{
+  position: absolute;
+  top: -60px; left: 16px;
+  z-index: 100;
+  background: var(--gold);
+  color: var(--black);
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  transition: top .2s var(--ease);
+}
+.skip-link:focus{ top: 16px; }
+
+:focus-visible{
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+}
+
+h1,h2,h3,.font-display{
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--cream);
+}
+
+/* заголовки секций: не капс, без "ярлычков сверху" — просто крупный, весомый текст */
+.section-title{
+  font-size: clamp(1.7rem, 1.2rem + 2vw, 2.6rem);
+  max-width: 16ch;
+}
+
+.section-lede{
+  color: var(--cream-dim);
+  max-width: 62ch;
+  font-size: 1.05rem;
+}
+
+.eyebrow{
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--gold);
+  font-size: .95rem;
+}
+
+/* ==========================================================
+   3. ДЕКОР — "монисто": ряд точек, отсылающий к монетным
+   поясам костюмов ATS. Используется как разделитель секций
+   вместо обычной тонкой линии.
+   ========================================================== */
+.coin-divider{
+  height: 22px;
+  width: 100%;
+  background-image: radial-gradient(circle, var(--gold) 0 3.5px, transparent 4px);
+  background-size: 26px 26px;
+  background-position: center;
+  background-repeat: repeat-x;
+  opacity: .55;
+}
+
+.coin-frame{
+  position: relative;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.coin-frame::after{
+  content: "";
+  position: absolute;
+  inset: -14px;
+  border-radius: calc(var(--radius-lg) + 14px);
+  background-image: radial-gradient(circle, var(--gold) 0 2.5px, transparent 3px);
+  background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(#000, transparent 70%);
+          mask-image: linear-gradient(#000, transparent 70%);
+  opacity: .5;
+  pointer-events: none;
+}
+
+/* ==========================================================
+   4. ЗАГЛУШКИ ВМЕСТО ФОТО
+   Просто серые блоки с лёгким узором по диагонали, чтобы
+   было видно, что это плейсхолдер, а не фон-баг.
+   Замените div.placeholder на <img class="placeholder" ...>
+   когда появятся настоящие фото.
+   ========================================================== */
+.placeholder{
+  background:
+    repeating-linear-gradient(135deg,
+      var(--placeholder-line) 0 2px,
+      transparent 2px 14px),
+    var(--placeholder);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: .8rem;
+  letter-spacing: .02em;
+  text-align: center;
+  min-height: 160px;
+}
+
+/* ==========================================================
+   5. ШАПКА / НАВИГАЦИЯ
+   ========================================================== */
+.site-header{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(11,9,8,.9);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 16px;
+}
+
+/* РЕДАКТИРОВАТЬ: логотип / название студии в шапке */
+.logo{
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: .01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.logo span{ color: var(--gold); }
+
+.nav{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-link{
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--cream-dim);
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.nav-link:hover{ color: var(--cream); }
+.nav-link[aria-current="page"]{
+  color: var(--black);
+  background: var(--gold);
+}
+
+.nav-toggle{
+  display: none;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.nav-toggle svg{ width: 20px; height: 20px; }
+
+/* ==========================================================
+   6. КНОПКИ
+   ========================================================== */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .95rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.btn:hover{ transform: translateY(-2px); }
+
+.btn-primary{
+  background: var(--gold);
+  color: var(--black);
+}
+.btn-primary:hover{ background: var(--gold-bright); }
+
+.btn-ghost{
+  background: transparent;
+  border-color: var(--border);
+  color: var(--cream);
+}
+.btn-ghost:hover{ border-color: var(--gold); color: var(--gold-bright); }
+
+/* ==========================================================
+   7. СТРАНИЦЫ (page-switcher)
+   По умолчанию видна только страница с классом is-active.
+   ========================================================== */
+.page{
+  display: none;
+}
+.page.is-active{
+  display: block;
+  animation: page-in var(--dur) var(--ease);
+}
+@keyframes page-in{
+  from{ opacity: 0; transform: translateY(10px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================
+   8. ГЛАВНАЯ — HERO
+   ========================================================== */
+.hero{
+  padding-block: clamp(48px, 8vw, 96px) 64px;
+}
+.hero-grid{
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.hero-title{
+  font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4.6rem);
+  letter-spacing: -.01em;
+}
+/* РЕДАКТИРОВАТЬ: девиз студии */
+.hero-motto{
+  margin-top: 18px;
+  font-family: var(--font-display);
+  color: var(--gold-bright);
+  font-size: 1.15rem;
+}
+
+/* РЕДАКТИРОВАТЬ: короткое вступительное описание студии */
+.hero-lede{
+  margin-top: 22px;
+  color: var(--cream-dim);
+  font-size: 1.08rem;
+  max-width: 52ch;
+}
+
+.hero-actions{
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.hero-media .placeholder{
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+}
+
+/* блок с быстрыми фактами под hero */
+.fact-row{
+  margin-top: 72px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.fact{
+  padding: 22px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.fact-num{
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  color: var(--gold);
+}
+.fact-label{
+  margin-top: 6px;
+  color: var(--cream-dim);
+  font-size: .92rem;
+}
+
+/* ==========================================================
+   9. ОБЩИЙ БЛОК СЕКЦИИ (переиспользуется на всех страницах)
+   ========================================================== */
+.section{
+  padding-block: 64px;
+}
+.section-head{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+
+/* Про стиль ATS — текст + список принципов */
+.about-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+/* РЕДАКТИРОВАТЬ: описание стиля FCBD/ATS */
+.about-text p + p{ margin-top: 16px; }
+.about-text{ color: var(--cream-dim); }
+
+.principle-list{
+  display: grid;
+  gap: 14px;
+}
+.principle{
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.principle-dot{
+  flex: none;
+  width: 10px; height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--rust);
+}
+.principle b{ color: var(--cream); }
+.principle span{ color: var(--cream-dim); font-size: .95rem; }
+
+/* ==========================================================
+   10. ИНФО — преподаватель, цены, расписание
+   ========================================================== */
+.teacher-card{
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
+  align-items: center;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.teacher-card .placeholder{
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+}
+/* РЕДАКТИРОВАТЬ: имя и описание преподавателя */
+.teacher-name{ font-size: 1.5rem; }
+.teacher-role{ color: var(--gold); font-weight: 600; margin-top: 4px; }
+.teacher-bio{ margin-top: 14px; color: var(--cream-dim); }
+
+.price-table{
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+.price-table caption{
+  text-align: left;
+  color: var(--cream-dim);
+  margin-bottom: 14px;
+  font-size: .95rem;
+}
+.price-table th, .price-table td{
+  text-align: left;
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.price-table thead th{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: .85rem;
+  color: var(--muted);
+}
+.price-table tbody tr:hover{ background: var(--surface); }
+.price-table td:last-child, .price-table th:last-child{
+  text-align: right;
+  font-family: var(--font-display);
+  color: var(--gold-bright);
+  white-space: nowrap;
+}
+
+.schedule-table{
+  width: 100%;
+  border-collapse: collapse;
+}
+.schedule-table th, .schedule-table td{
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.schedule-table thead th{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: .85rem;
+  color: var(--muted);
+}
+.schedule-table td.time{ color: var(--gold-bright); white-space: nowrap; }
+
+.two-col{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+/* ==========================================================
+   11. ГАЛЕРЕЯ
+   ========================================================== */
+.gallery-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 200px;
+  gap: 16px;
+}
+/* некоторым ячейкам задаём больший размер, чтобы сетка не была монотонной */
+.gallery-grid .placeholder:nth-child(3n+1){ grid-row: span 2; }
+.gallery-grid .placeholder:nth-child(5n+2){ grid-column: span 2; }
+
+/* ==========================================================
+   12. CTA-блок (записаться) — повторяется внизу страниц
+   ========================================================== */
+.cta-band{
+  margin-top: 24px;
+  padding: 44px clamp(20px, 4vw, 56px);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--rust-dim), var(--surface-2));
+  border: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+}
+.cta-band p{ color: var(--cream-dim); margin-top: 8px; max-width: 46ch; }
+
+/* ==========================================================
+   13. ПОДВАЛ
+   ========================================================== */
+.site-footer{
+  border-top: 1px solid var(--border);
+  padding-block: 48px;
+  margin-top: 40px;
+}
+.footer-grid{
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 32px;
+}
+.footer-title{
+  font-family: var(--font-display);
+  color: var(--cream);
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+/* РЕДАКТИРОВАТЬ: контакты в подвале (телефон/мессенджеры/соцсети) */
+.footer-list li + li{ margin-top: 10px; }
+.footer-list a{
+  color: var(--cream-dim);
+  text-decoration: none;
+}
+.footer-list a:hover{ color: var(--gold-bright); }
+
+.social-row{
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.social-row a{
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  transition: border-color var(--dur), color var(--dur);
+}
+.social-row a:hover{ border-color: var(--gold); color: var(--gold-bright); }
+.social-row svg{ width: 18px; height: 18px; }
+
+.footer-bottom{
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+/* ==========================================================
+   14. АДАПТИВНОСТЬ
+   ========================================================== */
+@media (max-width: 860px){
+  .hero-grid{ grid-template-columns: 1fr; }
+  .hero-media{ order: -1; }
+  .about-grid, .two-col{ grid-template-columns: 1fr; gap: 32px; }
+  .teacher-card{ grid-template-columns: 1fr; text-align: center; }
+  .teacher-card .placeholder{ margin-inline: auto; width: 160px; }
+  .footer-grid{ grid-template-columns: 1fr 1fr; }
+  .gallery-grid{ grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
+}
+
+@media (max-width: 640px){
+  .fact-row{ grid-template-columns: 1fr; }
+  .footer-grid{ grid-template-columns: 1fr; }
+  .price-table{ font-size: .9rem; }
+
+  .nav{
+    position: fixed;
+    inset: 66px 12px auto 12px;
+    flex-direction: column;
+    align-items: stretch;
+    background: var(--black-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    gap: 2px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.5);
+    transform-origin: top right;
+    transform: scale(.98);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s var(--ease), transform .18s var(--ease);
+  }
+  .nav.is-open{
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+  .nav-link{ text-align: left; border-radius: var(--radius-sm); }
+  .nav-toggle{ display: inline-flex; }
+}
+
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Перейти к содержимому</a>
+
+<!-- ==========================================================
+     ШАПКА САЙТА
+     ========================================================== -->
+<header class="site-header">
+  <div class="container header-inner">
+    <!-- РЕДАКТИРОВАТЬ: название студии в логотипе -->
+    <a class="logo" href="#home" data-nav="home">Tribal<span>Fox</span>Dance</a>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" id="navToggle">
+      <span class="visually-hidden">Открыть меню</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+    <!-- Пункты меню = "страницы" сайта -->
+    <nav class="nav" id="site-nav" aria-label="Основная навигация">
+      <button class="nav-link" type="button" data-target="home" aria-current="page">Главная</button>
+      <button class="nav-link" type="button" data-target="info">Инфо</button>
+      <button class="nav-link" type="button" data-target="gallery">Галерея</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ==========================================================
+       СТРАНИЦА 1 — ГЛАВНАЯ
+       ========================================================== -->
+  <section class="page is-active" id="home" data-page="home" aria-labelledby="home-title">
+    <div class="container hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Танцевальная студия</p>
+          <!-- РЕДАКТИРОВАТЬ: главный заголовок -->
+          <h1 class="hero-title" id="home-title">American&nbsp;Tribal&nbsp;Style в&nbsp;Москве</h1>
+          <!-- РЕДАКТИРОВАТЬ: девиз -->
+          <p class="hero-motto">Живи танцуя!</p>
+          <!-- РЕДАКТИРОВАТЬ: вступительный текст -->
+          <p class="hero-lede">FCBD®Style — ATS — это богатый танцевальный коллаж, сплетённый из стилей восточных народов Испании, Индии, Северной Африки, Среднего Востока и Центральной Азии. Без ограничений по возрасту, опыту и мировоззрению.</p>
+          <div class="hero-actions">
+            <!-- РЕДАКТИРОВАТЬ: ссылка записи (мессенджер) -->
+            <a class="btn btn-primary" href="https://wa.me/79191069660">Записаться на пробное</a>
+            <button class="btn btn-ghost" type="button" data-target="info">Смотреть расписание</button>
+          </div>
+        </div>
+
+        <div class="hero-media">
+          <div class="coin-frame">
+            <!-- Заглушка вместо фото/видео с занятия -->
+            <div class="placeholder" role="img" aria-label="Фото занятия — временная заглушка">Фото занятия</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- РЕДАКТИРОВАТЬ: цифры-факты о студии -->
+      <div class="fact-row">
+        <div class="fact">
+          <p class="fact-num">10+</p>
+          <p class="fact-label">лет на сцене и в студии</p>
+        </div>
+        <div class="fact">
+          <p class="fact-num">5</p>
+          <p class="fact-label">танцевальных традиций в основе стиля</p>
+        </div>
+        <div class="fact">
+          <p class="fact-num">0</p>
+          <p class="fact-label">ограничений по возрасту и подготовке</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="coin-divider" aria-hidden="true"></div>
+
+    <div class="container section">
+      <div class="section-head">
+        <h2 class="section-title">Что такое ATS</h2>
+        <p class="section-lede">Импровизационный групповой танец, в основе которого — доверие внутри круга и общий язык движений.</p>
+      </div>
+
+      <div class="about-grid">
+        <!-- РЕДАКТИРОВАТЬ: развёрнутое описание стиля -->
+        <div class="about-text">
+          <p>FCBD®Style — ATS — это импровизация, которая предлагает выбор движения, смену лидера, право быть лидером и безоговорочное следование за лидером.</p>
+          <p>Изменение настроения, погодных условий и других обстоятельств не должно быть препятствием для выхода на сцену — в этом суть трайбл-импровизации.</p>
+        </div>
+
+        <ul class="principle-list">
+          <li class="principle">
+            <span class="principle-dot" aria-hidden="true"></span>
+            <p><b>Общий словарь движений.</b> <span>Каждая участница знает единый набор шагов и жестов-подсказок.</span></p>
+          </li>
+          <li class="principle">
+            <span class="principle-dot" aria-hidden="true"></span>
+            <p><b>Смена лидера.</b> <span>Роль ведущей переходит от одной танцовщицы к другой прямо во время танца.</span></p>
+          </li>
+          <li class="principle">
+            <span class="principle-dot" aria-hidden="true"></span>
+            <p><b>Импровизация в кругу.</b> <span>Нет фиксированной хореографии — есть чуткость к партнёршам рядом.</span></p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==========================================================
+       СТРАНИЦА 2 — ИНФО (преподаватель, цены, расписание)
+       ========================================================== -->
+  <section class="page" id="info" data-page="info" aria-labelledby="info-title">
+    <div class="container section">
+      <div class="section-head">
+        <p class="eyebrow">Инфо</p>
+        <h1 class="section-title" id="info-title">Преподаватель, цены и расписание</h1>
+      </div>
+
+      <!-- Карточка преподавателя -->
+      <div class="teacher-card">
+        <div class="placeholder" role="img" aria-label="Фото преподавателя — временная заглушка">Фото</div>
+        <div>
+          <!-- РЕДАКТИРОВАТЬ: имя и роль преподавателя -->
+          <h2 class="teacher-name">Оксана Толкунова</h2>
+          <p class="teacher-role">Танцевальный хореограф, основательница студии</p>
+          <!-- РЕДАКТИРОВАТЬ: биография преподавателя -->
+          <p class="teacher-bio">Ведёт занятия по FCBD®Style — ATS, выступает и ставит номера на стыке трайбл-фьюжн направлений. Работает с группами любого уровня — от новичков до перформанс-состава.</p>
+        </div>
+      </div>
+
+      <div class="coin-divider" aria-hidden="true" style="margin-block:48px"></div>
+
+      <div class="two-col">
+        <!-- Таблица цен -->
+        <div>
+          <h2 class="section-title" style="font-size:1.6rem">Цены</h2>
+          <!-- РЕДАКТИРОВАТЬ: таблица с ценами — добавляйте/удаляйте строки <tr> -->
+          <table class="price-table">
+            <caption>Стоимость занятий</caption>
+            <thead>
+              <tr>
+                <th scope="col">Формат</th>
+                <th scope="col">Цена</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Разовое занятие</td>
+                <td>1&nbsp;000&nbsp;₽</td>
+              </tr>
+              <tr>
+                <td>Абонемент на 4 занятия</td>
+                <td>3&nbsp;600&nbsp;₽</td>
+              </tr>
+              <tr>
+                <td>Абонемент на 8 занятий</td>
+                <td>6&nbsp;800&nbsp;₽</td>
+              </tr>
+              <tr>
+                <td>Пробное занятие</td>
+                <td>500&nbsp;₽</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Таблица расписания -->
+        <div>
+          <h2 class="section-title" style="font-size:1.6rem">Расписание</h2>
+          <!-- РЕДАКТИРОВАТЬ: расписание занятий -->
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th scope="col">День</th>
+                <th scope="col">Время</th>
+                <th scope="col">Группа</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Вторник</td>
+                <td class="time">19:00–20:30</td>
+                <td>Начинающие</td>
+              </tr>
+              <tr>
+                <td>Четверг</td>
+                <td class="time">19:00–20:30</td>
+                <td>Продолжающие</td>
+              </tr>
+              <tr>
+                <td>Суббота</td>
+                <td class="time">12:00–14:00</td>
+                <td>Перформанс-состав</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="cta-band">
+        <div>
+          <h2 class="section-title" style="font-size:1.5rem">Готовы попробовать?</h2>
+          <p>Напишите нам, и мы подберём удобную группу и время для первого занятия.</p>
+        </div>
+        <!-- РЕДАКТИРОВАТЬ: ссылка записи -->
+        <a class="btn btn-primary" href="https://wa.me/79191069660">Написать в WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       СТРАНИЦА 3 — ГАЛЕРЕЯ
+       ========================================================== -->
+  <section class="page" id="gallery" data-page="gallery" aria-labelledby="gallery-title">
+    <div class="container section">
+      <div class="section-head">
+        <p class="eyebrow">Галерея</p>
+        <h1 class="section-title" id="gallery-title">Фото и видео со&nbsp;студии</h1>
+        <p class="section-lede">Кадры с занятий, репетиций и выступлений. Замените заглушки на реальные фотографии, когда они будут готовы.</p>
+      </div>
+
+      <!-- РЕДАКТИРОВАТЬ: количество и порядок ячеек галереи —
+           просто копируйте/удаляйте блоки div.placeholder ниже -->
+      <div class="gallery-grid">
+        <div class="placeholder" role="img" aria-label="Фото — временная заглушка">Фото 1</div>
+        <div class="placeholder" role="img" aria-label="Фото — временная заглушка">Фото 2</div>
+        <div class="placeholder" role="img" aria-label="Фото — временная заглушка">Фото 3</div>
+        <div class="placeholder" role="img" aria-label="Фото — временная заглушка">Фото 4</div>
+        <div class="placeholder" role="img" aria-label="Видео — временная заглушка">Видео</div>
+        <div class="placeholder" role="img" aria-label="Фото — временная заглушка">Фото 5</div>
+        <div class="placeholder" role="img" aria-label="Фото — временная заглушка">Фото 6</div>
+        <div class="placeholder" role="img" aria-label="Фото — временная заглушка">Фото 7</div>
+        <div class="placeholder" role="img" aria-label="Фото — временная заглушка">Фото 8</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ==========================================================
+     ПОДВАЛ
+     ========================================================== -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <!-- РЕДАКТИРОВАТЬ: название студии и короткое описание в подвале -->
+      <p class="logo" style="font-size:1.05rem">Tribal<span>Fox</span>Dance</p>
+      <p style="margin-top:12px;color:var(--cream-dim);max-width:32ch">Школа American Tribal Style (ATS) и FCBD®Style в Москве.</p>
+
+      <!-- РЕДАКТИРОВАТЬ: ссылки на соцсети -->
+      <div class="social-row">
+        <a href="https://vk.com/id146370321" aria-label="VK">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.6 17.5c-5.9 0-9.3-4-9.4-10.8h3c.1 4.6 2.1 6.6 3.7 7V6.7h2.8v4.3c1.6-.2 3.2-2 3.8-4.3h2.8c-.4 2.8-2.5 4.9-3.9 5.7 1.5.7 3.8 2.5 4.7 5.1h-3.1c-.7-2.1-2.3-3.7-4.3-3.9v3.9h-.1z"/></svg>
+        </a>
+        <a href="https://wa.me/79191069660" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3zm0 16.3a7.2 7.2 0 0 1-3.7-1l-.3-.2-2.7.7.7-2.6-.2-.3A7.3 7.3 0 1 1 12 19.3zm4-5.4c-.2-.1-1.3-.6-1.5-.7-.2-.1-.3-.1-.5.1-.1.2-.5.7-.6.8-.1.2-.2.2-.4.1-.2-.1-.9-.3-1.7-1a6.2 6.2 0 0 1-1.2-1.5c-.1-.2 0-.3.1-.4l.3-.4.2-.3c.1-.1.1-.2 0-.4-.1-.1-.5-1.2-.7-1.7-.2-.4-.4-.4-.5-.4h-.4c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.3c.1.2 1.6 2.5 4 3.4.5.2.9.4 1.3.5.5.1 1 .1 1.4 0 .4-.1 1.3-.5 1.5-1 .2-.5.2-.9.1-1z"/></svg>
+        </a>
+        <a href="https://t.me/+79191069660" aria-label="Telegram">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.6 18.7 19.9c-.2 1.1-.9 1.4-1.8.9l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.3-4.9L18 6.7c.5-.4-.1-.6-.7-.3L6.7 12.9l-4.8-1.5c-1-.3-1-1 .2-1.5L20.6 3.4c.9-.3 1.6.2 1.3 1.2z"/></svg>
+        </a>
+        <a href="https://www.youtube.com/channel/UCkbji29r6TepCnYoDqq5WXA" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12s0-3.2-.4-4.7a2.5 2.5 0 0 0-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.5A2.5 2.5 0 0 0 2.4 7.3C2 8.8 2 12 2 12s0 3.2.4 4.7a2.5 2.5 0 0 0 1.8 1.8c1.5.5 7.8.5 7.8.5s6.3 0 7.8-.5a2.5 2.5 0 0 0 1.8-1.8c.4-1.5.4-4.7.4-4.7ZM10 15.3V8.7L15.8 12 10 15.3Z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <p class="footer-title">Разделы</p>
+      <ul class="footer-list">
+        <li><a href="#home" data-nav="home">Главная</a></li>
+        <li><a href="#info" data-nav="info">Инфо</a></li>
+        <li><a href="#gallery" data-nav="gallery">Галерея</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="footer-title">Контакты</p>
+      <!-- РЕДАКТИРОВАТЬ: телефон и почта -->
+      <ul class="footer-list">
+        <li><a href="tel:+79191069660">+7 919 106-96-60</a></li>
+        <li><a href="https://wa.me/79191069660">WhatsApp</a></li>
+        <li><a href="https://t.me/+79191069660">Telegram</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <p>&copy; <span id="year"></span> TribalFoxDance. Все права защищены.</p>
+    <p>Москва</p>
+  </div>
+</footer>
+
+<script>
+/* ==========================================================
+   ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ (Главная / Инфо / Галерея)
+   Ничего не нужно менять в этом блоке, чтобы редактировать
+   текст сайта — он просто показывает/скрывает секции .page.
+   ========================================================== */
+(function () {
+  var pages   = Array.prototype.slice.call(document.querySelectorAll('.page'));
+  var navBtns = Array.prototype.slice.call(document.querySelectorAll('[data-target]'));
+  var navLinks= Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
+  var nav     = document.getElementById('site-nav');
+  var navToggle = document.getElementById('navToggle');
+
+  function showPage(name, opts) {
+    opts = opts || {};
+    var found = false;
+
+    pages.forEach(function (section) {
+      var match = section.dataset.page === name;
+      section.classList.toggle('is-active', match);
+      section.toggleAttribute('aria-hidden', !match);
+      if (match) { found = true; }
+    });
+
+    if (!found) { return; }
+
+    // подсветка активного пункта меню
+    document.querySelectorAll('.nav-link').forEach(function (btn) {
+      var active = btn.dataset.target === name;
+      if (active) { btn.setAttribute('aria-current', 'page'); }
+      else { btn.removeAttribute('aria-current'); }
+    });
+
+    // обновляем адрес страницы без прыжка/перезагрузки
+    var newHash = '#' + name;
+    if (window.location.hash !== newHash) {
+      history.pushState(null, '', newHash);
+    }
+
+    // переносим фокус на заголовок открытой страницы — удобно для скринридеров и клавиатуры
+    if (!opts.skipFocus) {
+      var heading = document.querySelector('#' + name + ' h1, #' + name + ' [id$="-title"]');
+      if (heading) { heading.setAttribute('tabindex', '-1'); heading.focus(); }
+    }
+
+    // на мобильных — закрыть меню после выбора пункта
+    closeMobileNav();
+
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+
+  function closeMobileNav() {
+    nav.classList.remove('is-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  navBtns.forEach(function (el) {
+    el.addEventListener('click', function () {
+      showPage(el.dataset.target);
+    });
+  });
+
+  navLinks.forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      showPage(el.dataset.nav);
+    });
+  });
+
+  navToggle.addEventListener('click', function () {
+    var isOpen = nav.classList.toggle('is-open');
+    navToggle.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  window.addEventListener('popstate', function () {
+    var name = (window.location.hash || '#home').replace('#', '');
+    showPage(name, { skipFocus: true });
+  });
+
+  // при загрузке — открыть страницу из адреса, если она указана (например #gallery)
+  var initial = (window.location.hash || '#home').replace('#', '');
+  showPage(document.querySelector('#' + initial) ? initial : 'home', { skipFocus: true });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+</script>
+
+</body>
+</html>
