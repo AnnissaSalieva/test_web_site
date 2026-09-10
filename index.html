@@ -35,42 +35,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 
 <style>
-
-.silver-glint {
-    font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4.6rem);
-    letter-spacing: -.01em;
-    display: inline-block;
-    background: linear-gradient(
-        110deg,
-        #777 0%,
-        #777 42%,
-        #d5d5d5 46%,
-        #ffffff 50%,
-        #d5d5d5 54%,
-        #777 58%,
-        #777 100%
-    );
-
-    background-size: 300% 100%;
-    background-position: 100% 0;
-
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-
-    animation: silverGlint 4s ease-out 1 forwards;
-}
-
-@keyframes silverGlint {
-    from {
-        background-position: 100% 0;
-    }
-
-    to {
-        background-position: -50% 0;
-    }
-}
-
 /* ==========================================================
    1. ТОКЕНЫ — цвета, шрифты, отступы.
    Хотите поменять всю палитру сайта — меняйте значения здесь.
@@ -391,6 +355,38 @@ h1,h2,h3,.font-display{
 .hero-title{
   font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4.6rem);
   letter-spacing: -.01em;
+  display: inline-block;
+  background: linear-gradient(
+      110deg,
+      #777 0%,
+      #777 42%,
+      #d5d5d5 46%,
+      #ffffff 50%,
+      #d5d5d5 54%,
+      #777 58%,
+      #777 100%
+  );
+
+  background-size: 300% 100%;
+  background-position: 100% 0;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: silverGlint 4s ease-out 1 forwards;
+}
+
+@keyframes silverGlint {
+    from {
+        background-position: 100% 0;
+    }
+
+    to {
+        background-position: -50% 0;
+    }
+}
+
 }
 /* РЕДАКТИРОВАТЬ: девиз студии */
 .hero-motto{
@@ -733,10 +729,7 @@ h1,h2,h3,.font-display{
         <div>
           <p class="eyebrow">Танцевальная студия</p>
           <!-- РЕДАКТИРОВАТЬ: главный заголовок -->
-          <h1 class="hero-title" id="home-title">American&nbsp;Tribal&nbsp;Style в&nbsp;Москве</h1>
-
-          <span class="silver-glint"> Какой-нибудь красивый текст </span>
-          
+          <h1 class="hero-title" id="home-title">American&nbsp;Tribal&nbsp;Style в&nbsp;Москве</h1>          
           <!-- РЕДАКТИРОВАТЬ: девиз -->
           <p class="hero-motto">Живи танцуя!</p>
           <!-- РЕДАКТИРОВАТЬ: вступительный текст -->
