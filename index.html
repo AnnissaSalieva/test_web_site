@@ -355,8 +355,8 @@ h1,h2,h3,.font-display{
 .hero-title{
   font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4.6rem);
   letter-spacing: -.01em;
-      display: inline-block;
-    background: linear-gradient(
+  display: inline-block;
+  background: linear-gradient(
         110deg,
         #f7f7f7 0%,
         #5a5a5a 35%,
@@ -369,6 +369,7 @@ h1,h2,h3,.font-display{
         #5a5a5a 65%,
         #f7f7f7 100%
     );
+
     background-size: 300% 100%;
     background-position: 100% 0;
 
@@ -380,17 +381,12 @@ h1,h2,h3,.font-display{
 }
 
 @keyframes silverGlint {
-    0% {
+    from {
         background-position: 100% 0;
     }
-    90% {
+
+    to {
         background-position: -50% 0;
-    }
-    100% {
-        /* блик ушёл, под текстом остаётся светлый участок */
-        background-position: -50% 0;
-        background-image: linear-gradient(#f7f7f7, #f7f7f7);
-        background-size: 100% 100%;
     }
 }  
   
