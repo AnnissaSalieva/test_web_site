@@ -356,27 +356,24 @@ h1,h2,h3,.font-display{
   font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4.6rem);
   letter-spacing: -.01em;
   display: inline-block;
-  background: linear-gradient(
+    background: linear-gradient(
         110deg,
-        #f7f7f7 0%,
-        #5a5a5a 35%,
-        #777777 40%,
-        #dcdcdc 45%,
-        #ffffff 49%,
-        #ffffff 51%,
-        #dcdcdc 55%,
-        #777777 60%,
-        #5a5a5a 65%,
+        #5a5a5a 0%,
+        #777777 5%,
+        #dcdcdc 10%,
+        #ffffff 14%,
+        #ffffff 16%,
+        #dcdcdc 20%,
+        #777777 25%,
+        #5a5a5a 30%,
+        #f7f7f7 45%,
         #f7f7f7 100%
     );
-
     background-size: 300% 100%;
-    background-position: 100% 0;
-
+    background-position: 0 0;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-
     animation: silverGlint 5s ease-out 1 forwards;
 }
 
@@ -384,9 +381,8 @@ h1,h2,h3,.font-display{
     from {
         background-position: 100% 0;
     }
-
     to {
-        background-position: -50% 0;
+        background-position: 0 0;
     }
 }  
   
