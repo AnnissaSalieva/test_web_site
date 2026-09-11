@@ -355,34 +355,42 @@ h1,h2,h3,.font-display{
 .hero-title{
   font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4.6rem);
   letter-spacing: -.01em;
-  display: inline-block;
+      display: inline-block;
     background: linear-gradient(
         110deg,
-        #5a5a5a 0%,
-        #777777 5%,
-        #dcdcdc 10%,
-        #ffffff 14%,
-        #ffffff 16%,
-        #dcdcdc 20%,
-        #777777 25%,
-        #5a5a5a 30%,
-        #f7f7f7 45%,
+        #f7f7f7 0%,
+        #5a5a5a 35%,
+        #777777 40%,
+        #dcdcdc 45%,
+        #ffffff 49%,
+        #ffffff 51%,
+        #dcdcdc 55%,
+        #777777 60%,
+        #5a5a5a 65%,
         #f7f7f7 100%
     );
     background-size: 300% 100%;
-    background-position: 0 0;
+    background-position: 100% 0;
+
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+
     animation: silverGlint 5s ease-out 1 forwards;
 }
 
 @keyframes silverGlint {
-    from {
+    0% {
         background-position: 100% 0;
     }
-    to {
-        background-position: 0 0;
+    90% {
+        background-position: -50% 0;
+    }
+    100% {
+        /* блик ушёл, под текстом остаётся светлый участок */
+        background-position: -50% 0;
+        background-image: linear-gradient(#f7f7f7, #f7f7f7);
+        background-size: 100% 100%;
     }
 }  
   
